@@ -325,6 +325,7 @@
 						//resolvedCount++;
 						resultArray.push(value);
 						if(resolvedCount === ln){
+							resolvedCount--;
 							resolve(resultArray);
 						}
 					},function(reason){
