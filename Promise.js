@@ -156,6 +156,15 @@
 				return;
 			}
 
+			if(isThenale(value)){
+				value.then(function(thenvalue){
+					resolveFn(thenvalue);
+				},function(thenreason){
+					rejectFn(thenreason);
+				});
+				return;
+			}
+
 			var callback = null;
 
 			promiseValue = value;
@@ -219,6 +228,7 @@
 		var self = this,
 			status = self._getStatus(),
 			promiseValue = self._getValue(),
+			throwErr = false,
 			returnValue = UNDEFINED;
 
 		if(isFunction(onRejected)){
@@ -231,6 +241,7 @@
 			try{
 				rValue = isFunction(fn) ? fn.call(null, value) : value;
 			}catch(e){
+				throwErr = true;
 				rValue = e;
 			}
 			return rValue;
@@ -239,7 +250,7 @@
 		return new Promise(function(resolve, reject){
 
 			function handler(value, fn){
-				if(value instanceof Error){
+				if(value instanceof Error && throwErr){
 					reject(value);
 				}else if(isThenale(value)){
 					//if the 'return-value' of the 'then' function is a promise, when the state of 'returned promise' in the list:
