@@ -152,6 +152,10 @@
 		function resolveFn(value){
 			'use strict';
 
+			if(PENDING !== promiseStatus){
+				return;
+			}
+
 			var callback = null;
 
 			promiseValue = value;
@@ -164,6 +168,10 @@
 
 		function rejectFn(reason){
 			'use strict';
+
+			if(PENDING !== promiseStatus){
+				return;
+			}
 
 			var callback = null;
 
@@ -285,13 +293,15 @@
 
 	Promise.all = function(promises){
 		'use strict';
+
 		var resolvedCount = 0,
 			resultArray = [],
 			i = 0, ln, promise;
 
 		return new Promise(function(resolve, reject){
 			if(!! isArray(Promises)){
-				reject(throw new TypeError('Promise.all need a array of Promise!'));
+				//reject(throw new TypeError('Promise.all need a array of Promise!'));
+				throw new TypeError('Promise.all need a array of Promise!');
 			}
 
 			ln = promises.length;
@@ -321,11 +331,14 @@
 
 	Promise.race = function(promises){
 		'use strict';
-		var i = 0, ln, promise;
+
+		var i = 0, ln, promise;		
 
 		return new Promise(function(resolve, reject){
+			
 			if(!! isArray(Promises)){
-				reject(throw new TypeError('Promise.all need a array as the first argument, but get:' + toString(promises)));
+				//reject(throw new TypeError('Promise.all need a array as the first argument');
+				throw new TypeError('Promise.all need a array of Promise!');
 			}
 
 			ln = promises.length;
@@ -349,12 +362,38 @@
 		});
 	};
 
-	Promise.resolve = function(){
+	Promise.resolve = function(args){
+		'use strict';
 
+		var promise = null;
+
+		if(args instanceof Promise){
+			promise = args;
+		}else if(isThenale(args)){
+			promise = new Promise(args.then);
+		}else{
+			promise = new Promise(function(resolve){
+				resolve(args);
+			});
+		}
+		return promise;
 	};
 
-	Promise.reject = function(){
+	Promise.reject = function(args){
+		'use strict';
 
+		var promise = null;
+
+		if(args instanceof Promise){
+			promise = args;
+		}else if(isThenale(args)){
+			promise = new Promise(args.then);
+		}else{
+			promise = new Promise(function(resolve, reject){
+				reject(args);
+			});
+		}
+		return promise;
 	};
 
 	Promise.prototype.valueOf = function(){
