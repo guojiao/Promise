@@ -305,23 +305,24 @@
 	Promise.all = function(promises){
 		'use strict';
 
-		var resolvedCount = 0,
-			resultArray = [],
-			i = 0, ln, promise;
+		var resultArray = [], 
+			resolvedCount = 0,
+			i, ln, promise;
 
 		return new Promise(function(resolve, reject){
-			if(!! isArray(Promises)){
+			if(!isArray(promises)){
 				//reject(throw new TypeError('Promise.all need a array of Promise!'));
 				throw new TypeError('Promise.all need a array of Promise!');
 			}
 
 			ln = promises.length;
 
-			for(;i < ln; i++){
+			for(i=0; i<ln; i++){
 				promise = promises[i];
+				resolvedCount++;
 				if(isThenale(promise)){
 					promise.then(function(value){
-						resolvedCount++;
+						//resolvedCount++;
 						resultArray.push(value);
 						if(resolvedCount === ln){
 							resolve(resultArray);
@@ -330,7 +331,7 @@
 						reject(reason);
 					});
 				}else{
-					resolvedCount++;
+					//resolvedCount++;
 					resultArray.push(promise);
 				}
 			}
@@ -343,26 +344,22 @@
 	Promise.race = function(promises){
 		'use strict';
 
-		var i = 0, ln, promise;		
+		var ln, promise;		
 
 		return new Promise(function(resolve, reject){
 			
-			if(!! isArray(Promises)){
+			if(!isArray(promises)){
 				//reject(throw new TypeError('Promise.all need a array as the first argument');
 				throw new TypeError('Promise.all need a array of Promise!');
 			}
 
 			ln = promises.length;
 
-			for(;i < ln; i++){
-				promise = promises[i];
+			for(; ln > 0; ln--){
+				promise = promises[ln-1];
 				if(isThenale(promise)){
 					promise.then(function(value){
-						resolvedCount++;
-						resultArray.push(value);
-						if(resolvedCount === ln){
-							resolve(resultArray);
-						}
+						resolve(value);
 					},function(reason){
 						reject(reason);
 					});
@@ -380,13 +377,12 @@
 
 		if(args instanceof Promise){
 			promise = args;
-		}else if(isThenale(args)){
-			promise = new Promise(args.then);
 		}else{
 			promise = new Promise(function(resolve){
 				resolve(args);
-			});
+			})
 		}
+
 		return promise;
 	};
 
@@ -397,8 +393,6 @@
 
 		if(args instanceof Promise){
 			promise = args;
-		}else if(isThenale(args)){
-			promise = new Promise(args.then);
 		}else{
 			promise = new Promise(function(resolve, reject){
 				reject(args);
